@@ -2,11 +2,14 @@ import * as ts from "typescript";
 import * as fs from "fs";
 import * as path from "path";
 import {log} from "util";
+
 console.clear()
 console.log('start')
 
 const filename = "ttt213.ts";
-const code = `const i = 'num'`;
+const code = `function test(num) {
+\tlet ttt = '555'
+}`;
 
 const sourceFile = ts.createSourceFile(
     filename, code, ts.ScriptTarget.Latest
@@ -31,23 +34,45 @@ let n: any = ts.SyntaxKind[i.kind]
 
 let json: any = {}
 
-// console.log('+++)))')
+interface Obj {
+    any: any
+}
+
+// AST текущего и предыдущего файла
+const objCurrentAST: any = {}
+const objPreviousAST: any = {}
+let tempVariableCur: any = ''
+let tempVariablePrev: any = ''
+let tempNameCur: any = ''
+let tempNamePrev: any = ''
+let idxCur: number
+
 function printRecursiveFrom(
     node: ts.Node, indentLevel: number, sourceFile: ts.SourceFile
 ) {
     const indentation = "-".repeat(indentLevel);
+    // console.log(node.kind)
     const syntaxKind = ts.SyntaxKind[node.kind];
     const nodeText = node.getText(sourceFile);
 
-    // console.log(syntaxKind)
-    // console.log(`${indentation}${syntaxKind}: ${nodeText}`);
+    // console.log(indentLevel)
+    // console.log(node)
+    console.log(`${indentation}${syntaxKind}: ${nodeText}`);
     // json[syntaxKind] = `${nodeText} + ${node.getStart(sourceFile)}`
     // console.log(node.getChildren(sourceFile))
     // json[indentLevel] = `${syntaxKind} + ${nodeText}`
     // console.log(syntaxKind)
-    if (0 === indentLevel) {
-
+    // console.log(node.getChildren(sourceFile))
+    console.log(objCurrentAST)
+    if (indentLevel === 0) {
+        tempNameCur = syntaxKind
+        objCurrentAST[nodeText] = {}
+        idxCur = indentLevel
+    } else {
+        let syn: string = 'syntaxKind'
+        objCurrentAST[tempNameCur][syn] = 'ttt'
     }
+    // console.log(node.getChildren(sourceFile))
     node.getChildren(sourceFile).forEach(child =>
         printRecursiveFrom(child, indentLevel + 1, sourceFile)
     );
@@ -64,9 +89,18 @@ function setJson(): void {
     fs.writeFile(path.resolve(__dirname, 'ast-main.json'), JSON.stringify(json), function(error){
 
         if(error) throw error; // если возникла ошибка
-        console.log("Асинхронная запись файла завершена. Содержимое файла:");
+        // console.log("Асинхронная запись файла завершена. Содержимое файла:");
     });
+
+    console.log('objCurrentAST', objCurrentAST)
 }
+
+
+
+
+
+
+
 
 `
 SourceFile
@@ -81,3 +115,4 @@ FirstAssignment
 StringLiteral
 EndOfFileToken
 `
+
