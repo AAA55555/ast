@@ -9,11 +9,28 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/plugin-syntax-jsx": "^7.17.12",
+    "@babel/preset-flow": "^7.17.12",
     "@types/node": "^17.0.35",
+    "flow": "^0.2.3",
+    "ts-morph": "^15.0.0",
     "ts-node": "^10.7.0",
-    "typescript": "^4.6.4"
+    "typescript": "^4.6.4",
+    "typescript-parser": "^2.6.1"
   },
   "dependencies": {
-    "ntypescript": "1.201706190042.1"
+    "@babel/core": "^7.18.2",
+    "@babel/generator": "^7.18.2",
+    "@babel/parser": "^7.18.3",
+    "@babel/traverse": "^7.18.2",
+    "@the-/ast": "^16.2.7",
+    "@typhonjs/babel-parser": "^0.2.0",
+    "abstract-syntax-tree": "^2.20.6",
+    "babel-core": "^6.26.3",
+    "babel-to-estree": "0.0.3",
+    "flowgen": "^1.19.0",
+    "ntypescript": "1.201706190042.1",
+    "putout": "^26.9.0",
+    "typhonjs-plugin-manager": "^0.2.0"
   }
 }

@@ -1,1 +1,11 @@
 https://basarat.gitbook.io/typescript/overview/ast/ast-tip-syntaxkind
+https://typescript-eslint.io/docs/development/architecture/asts/
+https://basarat.gitbook.io/typescript/overview/parser
+
+https://github.com/madou/typescript-transformer-handbook#what-is-a-abstract-syntax-tree-ast
+
+
+
+
+
+

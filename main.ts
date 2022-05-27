@@ -1,14 +1,18 @@
 import * as ts from "typescript";
 import * as fs from "fs";
 import * as path from "path";
-import {log} from "util";
 
 console.clear()
-console.log('start')
 
 const filename = "ttt213.ts";
-const code = `function test(num) {
-\tlet ttt = '555'
+const code = `/**
+ * # Ссылка на объект истории изменения статусов
+ */
+export interface StatusHistoryItemRef<T extends ItemData, P extends ItemData> extends ItemRef<StatusHistoryItem<T, P>> {
+    /**
+     * @ignore
+     */
+    readonly kind: 'statushistory';
 }`;
 
 const sourceFile = ts.createSourceFile(
@@ -23,23 +27,18 @@ let arrayKeys: string[] = Object.keys(objectAST)
 type ObjectKey = keyof typeof objectAST;
 
 const myVar = 'statements' as ObjectKey;
-// console.log('myVar')
-// console.log(myVar)
-// console.log(Array.isArray(objectAST[myVar]) );
-// console.log('---')
-// console.log(ts.isVariableDeclaration)
 let i: any = sourceFile['statements'][0]
 let n: any = ts.SyntaxKind[i.kind]
-// console.log(n)
-
+// console.log(i)
+// console.log(objectAST['pos'])
 let json: any = {}
 
 interface Obj {
-    any: any
+    [key: string]: any
 }
 
 // AST текущего и предыдущего файла
-const objCurrentAST: any = {}
+const objCurrentAST: Obj = {}
 const objPreviousAST: any = {}
 let tempVariableCur: any = ''
 let tempVariablePrev: any = ''
@@ -51,28 +50,22 @@ function printRecursiveFrom(
     node: ts.Node, indentLevel: number, sourceFile: ts.SourceFile
 ) {
     const indentation = "-".repeat(indentLevel);
-    // console.log(node.kind)
     const syntaxKind = ts.SyntaxKind[node.kind];
     const nodeText = node.getText(sourceFile);
 
-    // console.log(indentLevel)
-    // console.log(node)
-    console.log(`${indentation}${syntaxKind}: ${nodeText}`);
-    // json[syntaxKind] = `${nodeText} + ${node.getStart(sourceFile)}`
-    // console.log(node.getChildren(sourceFile))
-    // json[indentLevel] = `${syntaxKind} + ${nodeText}`
-    // console.log(syntaxKind)
-    // console.log(node.getChildren(sourceFile))
-    console.log(objCurrentAST)
     if (indentLevel === 0) {
         tempNameCur = syntaxKind
         objCurrentAST[nodeText] = {}
         idxCur = indentLevel
     } else {
         let syn: string = 'syntaxKind'
-        objCurrentAST[tempNameCur][syn] = 'ttt'
+        // objCurrentAST[tempNameCur][syn] = 'ttt'
     }
+    // console.log(`${indentation} ${syntaxKind} => ${nodeText}`)
+
+    if (syntaxKind.toLowerCase() === 'identifier') console.log(nodeText)
     // console.log(node.getChildren(sourceFile))
+    // node.getChildren(sourceFile).forEach(child =>
     node.getChildren(sourceFile).forEach(child =>
         printRecursiveFrom(child, indentLevel + 1, sourceFile)
     );
@@ -92,27 +85,8 @@ function setJson(): void {
         // console.log("Асинхронная запись файла завершена. Содержимое файла:");
     });
 
-    console.log('objCurrentAST', objCurrentAST)
+    // console.log('objCurrentAST', objCurrentAST)
 }
 
 
-
-
-
-
-
-
-`
-SourceFile
-SyntaxList
-FirstStatement
-VariableDeclarationList
-ConstKeyword
-SyntaxList
-VariableDeclaration
-Identifier
-FirstAssignment
-StringLiteral
-EndOfFileToken
-`
 
