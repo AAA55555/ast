@@ -1,0 +1,6 @@
+https://www.npmjs.com/package/ast-parser
+https://github.com/giniedp/ts-dox
+https://www.npmjs.com/package/ts-extractor
+https://stackoverflow.com/questions/36505533/how-to-extract-ast-of-given-typescript-code-using-the-open-source-typescript-com
+https://github.com/vtrushin/json-to-ast
+https://smack0007.github.io/blog/2021/convert-typescript-ast-to-json.html
