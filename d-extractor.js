@@ -1,90 +1,139 @@
 // Inspiration for this script taken from StackOverflow: https://stackoverflow.com/a/20197641/26566
 const fs = require('fs');
 const ts = require('typescript');
-const process = require('process');
 const path = require('path');
 
 // const source = './01_items.ts';
 //
 // const sourceFile = ts.createSourceFile(process.argv[2], source, ts.ScriptTarget.Latest, true);
-const filename = "ttt213.ts";
-const code = `
+
+const comparisonResults = []
+
+// Передаем код, чтобы получить у его AST
+const codeOne = `
 /**
  * @ignore
  * @packageDocumentation
  */
-
+import { Widget } from './102_ui_widgets';
+`;
+const codeTwo = `
+123
 /**
  * @ignore
+ * @packageDocumentation
  */
 import { Widget } from './102_ui_widgets';
-
-/**
- * # Корневой объект API для клиентских скриптов.
- */
-export interface UI {
-    /**
-     * Доступ к API отображения виджетов (применяется для виджета «Код»)
-     */
-    widget: Widget;
-    let elem = '444'
-}
-
 `;
 
-const sourceFile = ts.createSourceFile(
-  filename, code, ts.ScriptTarget.Latest
-);
-// Add an ID to every node in the tree to make it easier to identify in
-// the consuming application.
-let nextId = 0;
-function addId(node) {
-  nextId++;
-  node.id = nextId;
-  ts.forEachChild(node, addId);
+let jsonOne = new Promise((resolve, reject) => {
+  let res = getAST(codeOne)
+  if (typeof res === 'string') {
+    resolve(res)
+  } else {
+    reject('Ошибка в jsonOne')
+  }
+})
+
+let jsonTwo = new Promise((resolve, reject) => {
+  let res = getAST(codeTwo)
+  if (typeof res === 'string') {
+    resolve(res)
+  } else {
+    reject('Ошибка в jsonTwo')
+  }
+})
+
+Promise.all([jsonOne, jsonTwo])
+  .then(value => {
+    const [jsonOne, jsonTwo] = value
+
+    if (jsonOne !== jsonTwo) {
+      recursion(jsonOne, jsonTwo)
+    }
+  })
+  .catch(_ => console.log('Произошла ошибка!'))
+
+
+function recursion(jsonOne, jsonTwo) {
+  // setJson(jsonOne)
+  if (jsonOne.fileName === jsonTwo.fileName) {
+    getSortAST(jsonOne)
+  } else {
+    console.log('Структура файла разная')
+  }
 }
-addId(sourceFile);
 
-// No need to save the source again.
-delete sourceFile.text;
+function getSortAST(el = el.statements) {
 
-const cache = [];
-const json = JSON.stringify(sourceFile, (key, value) => {
-  // Discard the following.
-console.log(key)
+}
 
-  if (key === 'flags' || key === 'transformFlags' || key === 'modifierFlagsCache') {
-    return;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Получаем AST
+function getAST(code) {
+// filename сделать по имени файла
+  const filename = 'temp.ts';
+  const sourceFile = ts.createSourceFile(
+    filename, code, ts.ScriptTarget.Latest
+  );
+// Добавляем идентификатор(id) к каждому узлу в дереве, чтобы его было легче идентифицировать
+  let nextId = 0;
+
+  function addId(node) {
+    nextId++;
+    node.id = nextId;
+    ts.forEachChild(node, addId);
   }
 
-  // Replace 'kind' with the string representation.
-  if (key === 'kind') {
-    value = ts.SyntaxKind[value];
-  }
+  addId(sourceFile);
 
-  if (typeof value === 'object' && value !== null) {
-    // Duplicate reference found, discard key
-    if (cache.includes(value)) return;
+// Нет необходимости снова сохранять источник кода (code)
+  delete sourceFile.text;
 
-    cache.push(value);
-  }
-  return value;
-});
+// копия текущего AST
+  const cache = [];
+  return JSON.stringify(sourceFile, (key, value) => {
+    // Следующий код исключает элементы из объекта при преобразовании в JSON
 
-// console.info(json);
+    if (key === 'flags' || key === 'transformFlags' || key === 'modifierFlagsCache') {
+      return;
+    }
 
-// console.log(cache)
-setTimeout(() => {
-  // console.log(json)
-  setJson()
-}, 500)
+    // Замените «ребенка» строковым представлением.
+    if (key === 'kind') {
+      value = ts.SyntaxKind[value];
+    }
 
-function setJson() {
-  fs.writeFile(path.resolve(__dirname, 'ast-main.json'), json, function(error){
+    if (typeof value === 'object' && value !== null) {
+      // Найден дубликат ссылки, удалить ключ
+      if (cache.includes(value)) return;
 
-    if(error) throw error; // если возникла ошибка
-    // console.log("Асинхронная запись файла завершена. Содержимое файла:");
+      cache.push(value);
+    }
+    return value;
   });
+}
 
-  // console.log('objCurrentAST', objCurrentAST)
+// сохраняет различия в JSON файл
+function setJson(json) {
+  fs.writeFile(path.resolve(__dirname, 'ast-main.json'), json, function (error) {
+    if (error) throw error;
+    console.log("Запись файла завершена. Содержимое файла: находится ...");
+  });
 }
